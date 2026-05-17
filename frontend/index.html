@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Curiosity Museum</title>
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/cards.css">
+  </head>
+  <body class="theme-velvet">
+    <button id="dev-trigger" class="dev-trigger" type="button" aria-label="Open dev settings" aria-expanded="false">
+      <span aria-hidden="true">&#9881;</span>
+    </button>
+    <main class="museum-shell">
+      <section class="reveal-stage" aria-live="polite">
+        <button id="mystery-box" class="mystery-box" type="button">
+          <span class="box-lid"></span>
+          <span class="box-body">What's inside?</span>
+        </button>
+        <article id="item-card" class="item-card is-hidden"></article>
+
+        <nav class="action-row" aria-label="Curiosity actions">
+          <button id="read-more" class="text-button" type="button" hidden>Read more</button>
+          <button id="another" class="text-button accent" type="button" hidden>Another</button>
+        </nav>
+      </section>
+    </main>
+
+    <aside id="dev-panel" class="dev-panel" hidden>
+      <h2>Dev</h2>
+      <label><input id="show-id" type="checkbox"> Show item ID</label>
+      <label><input id="show-source" type="checkbox"> Show dataset source</label>
+      <label><input id="show-json" type="checkbox"> Show raw JSON</label>
+      <label><input id="disable-smart" type="checkbox"> Disable smart random</label>
+      <label><input id="toggle-morbid" type="checkbox" checked> Morbid content</label>
+      <label>
+        Force category
+        <select id="force-category">
+          <option value="">Any</option>
+        </select>
+      </label>
+      <label>
+        Force template
+        <select id="force-template">
+          <option value="">Item default</option>
+          <option value="archive">Archive</option>
+          <option value="memorial">Memorial</option>
+          <option value="tale">Tale</option>
+          <option value="specimen">Specimen</option>
+          <option value="incident">Incident</option>
+        </select>
+      </label>
+      <button id="clear-history" type="button">Clear session history</button>
+    </aside>
+
+    <script>
+      (() => {
+        const trigger = document.querySelector("#dev-trigger");
+        const panel = document.querySelector("#dev-panel");
+        if (!trigger || !panel) return;
+
+        trigger.addEventListener("click", () => {
+          const shouldOpen = panel.hasAttribute("hidden");
+          panel.toggleAttribute("hidden", !shouldOpen);
+          trigger.setAttribute("aria-expanded", String(shouldOpen));
+        });
+      })();
+    </script>
+    <script type="module" src="/js/app.js"></script>
+  </body>
+</html>
