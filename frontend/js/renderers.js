@@ -53,18 +53,32 @@ function categoryLabel(item) {
 }
 
 
+function categoryArtFor(item) {
+  if (item.metadata?.icon) {
+    return {
+      src: item.metadata.icon,
+      alt: `${categoryLabel(item)} mark`,
+      className: "category-art-symbol",
+    };
+  }
+  return categoryArt[item.category];
+}
+
+
 function titleCase(value) {
   return value.replace(/\w\S*/g, (word) => word[0].toUpperCase() + word.slice(1).toLowerCase());
 }
 
 
 function classification(item) {
-  return titleCase(rawText(item.metadata?.order || item.subcategory).replaceAll("_", " "));
+  return titleCase(
+    rawText(item.metadata?.classification || item.metadata?.order || item.subcategory).replaceAll("_", " "),
+  );
 }
 
 
-function baseCard(item, dev) {
-  const art = categoryArt[item.category];
+function baseCard(item, dev, actions = {}) {
+  const art = categoryArtFor(item);
   const meta = [
     field("Era", item.era),
     field("Region", item.region),
@@ -80,7 +94,7 @@ function baseCard(item, dev) {
   return `
     ${
       art
-        ? `<figure class="category-medallion category-art-${text(item.category)}" aria-label="${text(art.alt)}"><img src="${text(art.src)}" alt=""></figure>`
+        ? `<figure class="category-medallion category-art-${text(item.category)} ${text(art.className || "")}" aria-label="${text(art.alt)}"><img src="${text(art.src)}" alt=""></figure>`
         : ""
     }
     <header>
@@ -88,35 +102,43 @@ function baseCard(item, dev) {
       <h1>${text(item.title)}</h1>
       ${item.subtitle ? `<p class="subtitle">${text(item.subtitle)}</p>` : ""}
     </header>
-    ${item.description ? `<div class="description">${text(item.description)}</div>` : ""}
+    ${
+      item.description
+        ? `<div class="description">${text(item.description)}${
+            actions.canReadMore
+              ? ` <button class="inline-read-more" type="button" data-card-action="read-more">Read more</button>`
+              : ""
+          }</div>`
+        : ""
+    }
     ${meta ? `<dl>${meta}</dl>` : ""}
     ${json}
   `;
 }
 
 
-export function renderArchiveCard(item, dev) {
-  return baseCard(item, dev);
+export function renderArchiveCard(item, dev, actions) {
+  return baseCard(item, dev, actions);
 }
 
 
-export function renderMemorialCard(item, dev) {
-  return baseCard(item, dev);
+export function renderMemorialCard(item, dev, actions) {
+  return baseCard(item, dev, actions);
 }
 
 
-export function renderTaleCard(item, dev) {
-  return baseCard(item, dev);
+export function renderTaleCard(item, dev, actions) {
+  return baseCard(item, dev, actions);
 }
 
 
-export function renderSpecimenCard(item, dev) {
-  return baseCard(item, dev);
+export function renderSpecimenCard(item, dev, actions) {
+  return baseCard(item, dev, actions);
 }
 
 
-export function renderIncidentCard(item, dev) {
-  return baseCard(item, dev);
+export function renderIncidentCard(item, dev, actions) {
+  return baseCard(item, dev, actions);
 }
 
 

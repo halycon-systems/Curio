@@ -11,7 +11,6 @@ import {
 const mysteryBox = document.querySelector("#mystery-box");
 const itemCard = document.querySelector("#item-card");
 const another = document.querySelector("#another");
-const readMore = document.querySelector("#read-more");
 const devTrigger = document.querySelector("#dev-trigger");
 const devPanel = document.querySelector("#dev-panel");
 const forceCategory = document.querySelector("#force-category");
@@ -19,6 +18,7 @@ const forceTemplate = document.querySelector("#force-template");
 
 let currentItem = null;
 let currentExpanded = false;
+let isRevealing = false;
 let devSettings = loadDevSettings();
 
 function syncDevControls() {
@@ -49,33 +49,55 @@ function renderItem(item) {
   const itemToRender = { ...item };
   if (devSettings.forceTemplate) itemToRender.template = devSettings.forceTemplate;
   const renderer = templates[itemToRender.template] || templates.archive;
-  itemCard.className = `item-card template-${itemToRender.template}`;
-  itemCard.innerHTML = renderer(itemToRender, devSettings);
+  itemCard.className = `item-card template-${itemToRender.template} category-${itemToRender.category}`;
+  itemCard.innerHTML = renderer(itemToRender, devSettings, {
+    canReadMore: canReadMore(itemToRender),
+  });
   itemCard.classList.remove("is-hidden");
+  itemCard.classList.add("is-entering");
+  window.setTimeout(() => itemCard.classList.remove("is-entering"), 420);
   document.body.className = `theme-${itemToRender.theme || "velvet"}`;
 }
 
 async function reveal() {
-  currentExpanded = false;
-  mysteryBox.hidden = true;
-  itemCard.classList.add("is-hidden");
-  itemCard.innerHTML = "";
+  if (isRevealing) return;
+  isRevealing = true;
+  another.disabled = true;
+  try {
+    currentExpanded = false;
+    const hasCard = !itemCard.classList.contains("is-hidden") && itemCard.innerHTML;
 
-  const history = loadHistory();
-  const category = devSettings.forceCategory;
-  currentItem = await fetchRandomItem({
-    category,
-    recentItemIds: history.recentItemIds,
-    recentCategories: history.recentCategories,
-    recentSubcategories: history.recentSubcategories || [],
-    recentMoods: history.recentMoods,
-    disableSmartRandom: devSettings.disableSmartRandom,
-    includeMorbid: devSettings.morbidContent,
-  });
-  rememberItem(currentItem);
-  renderItem(currentItem);
-  another.hidden = false;
-  readMore.hidden = !canReadMore(currentItem);
+    if (hasCard) {
+      itemCard.classList.add("is-exiting");
+      await wait(220);
+    } else {
+      mysteryBox.hidden = true;
+      itemCard.classList.add("is-hidden");
+    }
+
+    const history = loadHistory();
+    const category = devSettings.forceCategory;
+    currentItem = await fetchRandomItem({
+      category,
+      recentItemIds: history.recentItemIds,
+      recentCategories: history.recentCategories,
+      recentSubcategories: history.recentSubcategories || [],
+      recentMoods: history.recentMoods,
+      disableSmartRandom: devSettings.disableSmartRandom,
+      includeMorbid: devSettings.morbidContent,
+    });
+    rememberItem(currentItem);
+    itemCard.classList.remove("is-exiting");
+    renderItem(currentItem);
+    another.hidden = false;
+  } finally {
+    another.disabled = false;
+    isRevealing = false;
+  }
+}
+
+function wait(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
 function canReadMore(item) {
@@ -100,7 +122,12 @@ async function loadCategoryOptions() {
 
 mysteryBox.addEventListener("click", reveal);
 another.addEventListener("click", reveal);
-readMore.addEventListener("click", () => {
+
+itemCard.addEventListener("click", (event) => {
+  if (!(event.target instanceof Element)) return;
+  const action = event.target.closest("[data-card-action]");
+  if (!action || action.dataset.cardAction !== "read-more") return;
+
   if (currentItem?.source_url) {
     window.open(currentItem.source_url, "_blank", "noopener");
     return;
@@ -111,7 +138,6 @@ readMore.addEventListener("click", () => {
       ...currentItem,
       description: currentItem.metadata.full_description,
     });
-    readMore.hidden = true;
   }
 });
 

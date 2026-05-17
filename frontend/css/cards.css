@@ -10,7 +10,7 @@
     0 0.6rem 0 -0.28rem rgba(18, 8, 11, 0.95),
     0 2rem 5rem var(--shadow),
     inset 0 0 0 1px rgba(255, 238, 198, 0.045);
-  animation: reveal 360ms ease both;
+  transform-origin: 50% 100%;
 }
 
 .item-card::before {
@@ -58,11 +58,17 @@
     radial-gradient(circle at 48% 42%, rgba(218, 207, 183, 0.82), rgba(134, 124, 107, 0.64) 64%, rgba(44, 37, 35, 0.72));
 }
 
-.category-art-morbid_history img {
+.category-art-morbid_history img,
+.category-art-symbol img {
   object-fit: contain;
   padding: 0.62rem;
   filter: invert(0.92) sepia(0.18) saturate(0.72) contrast(1.18) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.42));
   transform: none;
+}
+
+.category-art-symbol {
+  background:
+    radial-gradient(circle at 48% 42%, rgba(238, 221, 181, 0.78), rgba(142, 103, 72, 0.54) 64%, rgba(40, 22, 20, 0.72));
 }
 
 .item-card header {
@@ -100,6 +106,22 @@
   line-height: 1.58;
 }
 
+.inline-read-more {
+  display: inline;
+  border: 0;
+  background: transparent;
+  color: var(--accent-strong);
+  padding: 0 0 0 0.25rem;
+  text-decoration: underline;
+  text-decoration-color: rgba(198, 161, 91, 0.42);
+  text-underline-offset: 0.18em;
+}
+
+.inline-read-more:hover {
+  color: #f2d99b;
+  text-decoration-color: rgba(224, 189, 114, 0.9);
+}
+
 .item-card dl {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
@@ -122,8 +144,72 @@
   border-color: rgba(154, 143, 130, 0.28);
 }
 
+.category-sacred_history {
+  background:
+    linear-gradient(90deg, rgba(198, 161, 91, 0.11), transparent 0.45rem),
+    linear-gradient(180deg, rgba(255, 238, 198, 0.035), transparent 9rem),
+    var(--card-bg);
+}
+
+.category-sacred_history .kicker {
+  color: #d6bd8b;
+}
+
+.category-sacred_history h1 {
+  font-size: clamp(1.85rem, 6vw, 3.45rem);
+}
+
+.category-sacred_history dl {
+  border-top: 1px solid rgba(198, 161, 91, 0.14);
+  padding-top: 1rem;
+}
+
 .template-tale {
-  box-shadow: 0 2rem 5rem var(--shadow), inset 0 0 4rem rgba(198, 161, 91, 0.07);
+  background:
+    radial-gradient(circle at 18% 8%, rgba(215, 169, 79, 0.11), transparent 10rem),
+    linear-gradient(180deg, rgba(255, 238, 198, 0.045), transparent 9rem),
+    var(--card-bg);
+  box-shadow:
+    0 0.6rem 0 -0.28rem rgba(18, 8, 11, 0.95),
+    0 2rem 5rem var(--shadow),
+    inset 0 0 4rem rgba(198, 161, 91, 0.09);
+}
+
+.template-tale::before {
+  border-style: dashed;
+  border-color: rgba(215, 169, 79, 0.16);
+}
+
+.template-tale .kicker {
+  color: #e0b65c;
+}
+
+.template-tale h1 {
+  font-size: clamp(2.15rem, 7vw, 4.15rem);
+  line-height: 1;
+}
+
+.template-tale .subtitle {
+  color: #d6bf94;
+  font-style: italic;
+}
+
+.template-tale .description {
+  font-size: 1.08rem;
+}
+
+.template-tale dl {
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  border-top: 1px solid rgba(215, 169, 79, 0.13);
+  padding-top: 1rem;
+}
+
+.item-card.is-entering {
+  animation: card-drawer-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.item-card.is-exiting {
+  animation: card-drawer-out 220ms ease both;
 }
 
 .dev-json {
@@ -139,14 +225,29 @@
   white-space: pre-wrap;
 }
 
-@keyframes reveal {
+@keyframes card-drawer-in {
   from {
     opacity: 0;
-    transform: translateY(0.8rem);
+    filter: blur(4px);
+    transform: translateY(1.1rem) rotateX(-7deg) scale(0.985);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    filter: blur(0);
+    transform: translateY(0) rotateX(0) scale(1);
+  }
+}
+
+@keyframes card-drawer-out {
+  from {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) rotateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    filter: blur(3px);
+    transform: translateY(-0.55rem) rotateX(4deg) scale(0.992);
   }
 }
 

@@ -16,6 +16,15 @@
   --card-border: rgba(211, 168, 79, 0.36);
 }
 
+.theme-folk {
+  --bg: #060303;
+  --text: #f5ead3;
+  --muted: #bba681;
+  --accent: #d7a94f;
+  --card-bg: rgba(20, 9, 7, 0.93);
+  --card-border: rgba(215, 169, 79, 0.34);
+}
+
 .theme-quiet {
   --bg: #060607;
   --text: #e8e0d4;

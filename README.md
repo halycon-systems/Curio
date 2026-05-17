@@ -16,6 +16,8 @@ Open `http://127.0.0.1:8000`.
 
 Raw files are ingestion inputs only. Run `python scripts/ingest.py` to normalize them into `data/museum.db`; the FastAPI app reads from SQLite at runtime and does not touch the cursed workbooks during normal browsing.
 
+Ingestion is replace-by-dataset. If `raw/handcrafted/superstitions.json` changes, rerunning `python scripts/ingest.py` clears the old `superstitions` rows from SQLite and inserts the current file contents fresh. This keeps mutable handcrafted collections from leaving stale records behind when order, wording, or indexes change.
+
 Drop JSON files here:
 
 ```text
@@ -25,6 +27,8 @@ raw/handcrafted/obsolete_household_objects.json
 raw/handcrafted/superstitions.json
 raw/handcrafted/weird_place_names.json
 ```
+
+Handcrafted JSON may also live in `data/raw/*.json`; this is where the mutable local `superstitions.json` collection is currently read from.
 
 The monastery ingestor also reads the source workbook at:
 
@@ -51,4 +55,4 @@ Common aliases are normalized:
 
 ## Dev Settings
 
-Triple-click the invisible top-left corner of the page, or shift-click it, to open the dev panel.
+Click the small settings cog in the bottom-right corner to open the dev panel.

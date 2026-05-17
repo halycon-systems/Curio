@@ -112,8 +112,39 @@ def upsert_dataset(conn: sqlite3.Connection, dataset: Dataset) -> int:
     row = conn.execute("SELECT id FROM datasets WHERE slug = ?", (dataset.slug,)).fetchone()
     if row is None:
         raise RuntimeError(f"Dataset was not written: {dataset.slug}")
-    conn.execute("DELETE FROM items WHERE dataset_id = ?", (row["id"],))
     return int(row["id"])
+
+
+def replace_dataset_items(
+    conn: sqlite3.Connection, dataset: Dataset, items: Iterable[MuseumItem]
+) -> int:
+    dataset_id = upsert_dataset(conn, dataset)
+    conn.execute("DELETE FROM items WHERE dataset_id = ?", (dataset_id,))
+    count = insert_items(conn, dataset_id, items)
+    conn.execute(
+        """
+        DELETE FROM tags
+        WHERE id NOT IN (SELECT DISTINCT tag_id FROM item_tags)
+        """
+    )
+    conn.commit()
+    return count
+
+
+def delete_dataset(conn: sqlite3.Connection, slug: str) -> None:
+    conn.execute("DELETE FROM datasets WHERE slug = ?", (slug,))
+    conn.execute(
+        """
+        DELETE FROM tags
+        WHERE id NOT IN (SELECT DISTINCT tag_id FROM item_tags)
+        """
+    )
+    conn.commit()
+
+
+def fetch_dataset_slugs(conn: sqlite3.Connection) -> list[str]:
+    rows = conn.execute("SELECT slug FROM datasets ORDER BY slug").fetchall()
+    return [row["slug"] for row in rows]
 
 
 def insert_items(
@@ -165,8 +196,10 @@ def insert_items(
             )
         count += 1
 
-    conn.execute("UPDATE datasets SET item_count = ? WHERE id = ?", (count, dataset_id))
-    conn.commit()
+    conn.execute(
+        "UPDATE datasets SET item_count = ? WHERE id = ?",
+        (count, dataset_id),
+    )
     return count
 
 

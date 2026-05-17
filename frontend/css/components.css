@@ -97,6 +97,12 @@
   transform: translateY(-1px);
 }
 
+.text-button:disabled {
+  cursor: default;
+  opacity: 0.62;
+  transform: none;
+}
+
 .dev-trigger {
   position: fixed;
   right: 0.9rem;
